@@ -1,0 +1,95 @@
+from tkinter import *
+import tkinter as tk
+from tkinter import ttk, messagebox
+import pymysql
+import random
+
+from  Signup import *
+
+def startcamera():
+    print("welcome!")
+    exec(open("live.py").read())  
+
+def clear():
+        userentry.delete(0,END)
+        passentry.delete(0,END)
+
+ 
+def openSignup():
+    signupwindow()
+    
+def checklogin():
+ 
+        if useridentry.get()=="" and passentry.get()=="":
+                messagebox.showerror("Error","Enter User id",parent=winlogin)
+        elif useridentry.get()=="Admin" and passentry.get()=="tamil":
+                startcamera()
+        else:
+                try:                                
+                        con = pymysql.connect(host="localhost",user="root",password="root",database="cctv")
+                        cur = con.cursor()
+
+                        cur.execute("select username,password from login where username=%s and password=%s",(useridentry.get(),passentry.get()))
+                        row = cur.fetchone()
+
+                        if row==None:
+                                messagebox.showerror("Error" , "Invalid User id", parent = winlogin)
+
+                        else:
+                                messagebox.showinfo("Success" , "Successfully Login" , parent = winlogin)
+                                messagebox.showinfo("Start Camera" , "CCTV Camera Going to Start" , parent = winlogin)
+                                startcamera()
+                                con.close()   
+                                
+                except Exception as es:
+                        messagebox.showerror("Error" , f"Error Duo to : {str(es)}", parent = winlogin)
+
+                        
+winlogin = Tk()
+winlogin.title("Login Window")
+winlogin.maxsize(width=1000 ,  height=900)
+winlogin.minsize(width=1000 ,  height=900)
+winlogin.configure(bg='light blue')  
+
+#heading label
+heading = Label(winlogin , text = "Intelligence Video Surveillance" , bg='light green', font = 'Verdana 25 bold')
+heading.place(x=70 , y=20)
+
+#heading label
+heading = Label(winlogin , text = "Login" , bg='light blue',font = 'Verdana 20 bold')
+heading.place(x=250 , y=80)
+
+# form data label
+userid = Label(winlogin, text= "User Name:" , bg='light blue',font='Verdana 10 bold')
+userid.place(x=80,y=130)
+
+password = Label(winlogin, text= "Password :" , bg='light blue', font='Verdana 10 bold')
+password.place(x=80,y=180)
+       
+# Entry Box
+userid = StringVar()
+pass1 = StringVar() 
+        
+useridentry = Entry(winlogin, width=40 , textvariable = userid)
+useridentry.focus()
+useridentry.place(x=170 , y=130)
+
+passentry = Entry(winlogin, width=40 , textvariable = pass1)
+passentry.focus()
+passentry.place(x=170 , y=180)
+
+# button login and clear
+
+btn_login = Button(winlogin, text = "Login" ,font='Verdana 10 bold' , command = checklogin)
+btn_login.place(x=200, y=230)
+
+
+btn_clear = Button(winlogin, text = "Clear" ,font='Verdana 10 bold', command = clear)
+btn_clear.place(x=300, y=230)
+
+# signup button
+
+#sign_up_btn = Button(winlogin , text="Switch To Sign up" , font='Verdana 10 bold', command = openSignup )
+#sign_up_btn.place(x=400 , y =230)
+
+winlogin.mainloop()
